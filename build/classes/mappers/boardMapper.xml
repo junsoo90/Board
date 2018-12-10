@@ -1,0 +1,164 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.board.mappers.boardMapper">
+	<sql id="search">
+		<if test="searchType != null">
+			<if test="searchType == 't'.toString()">where title like concat('%' , #{keyword}, '%')</if>
+			<if test="searchType == 'c'.toString()">where content like concat('%' , #{keyword}, '%')</if>
+			<if test="searchType == 'w'.toString()">where writer like concat('%' , #{keyword}, '%')</if>
+			<if test="searchType == 'tc'.toString()">where (title like concat('%' , #{keyword}, '%'))
+				or
+				(content like concat('%' , #{keyword}, '%')) </if>
+		</if>
+	</sql>
+
+	<insert id="filewrite">
+		insert into myboard(title, content, writer,
+		passwd,filename, fileurl, fileoriname)
+		values(#{title}, #{content},
+		#{writer},
+		#{passwd},#{filename}, #{fileurl}, #{fileOriname})
+	</insert>
+	<!-- 작성 -->
+	<insert id="write">
+		insert into myboard(title, content, writer,
+		passwd,filename, fileurl, fileoriname)
+		values(#{title}, #{content},
+		#{writer},
+		#{passwd},#{filename}, #{fileurl}, #{fileOriname})
+	</insert>
+
+	<!-- 조회 -->
+	<select id="read" resultType="com.board.VO.BoardVO">
+		select *
+		from myBoard
+		where bno =
+		#{bno}
+	</select>
+
+	<select id="filesearch" resultType="com.board.VO.BoardVO">
+		select filename,
+		fileurl,fileoriname from myboard
+		where bno = #{bno}
+	</select>
+
+	<select id="boardinfo" resultType="com.board.VO.BoardVO">
+		select bno, title, content,
+		writer, passwd, filename, fileoriname, fileurl
+		from myboard
+		where bno = #{bno}
+	</select>
+
+	<select id="deletepasswd" resultType="String">
+		select passwd from myboard
+		where bno = #{bno}
+	</select>
+	<!-- 수정 -->
+	<update id="fileDelete">
+		update myboard set filename =null,
+		fileoriname=null,
+		fileurl=null
+		where bno=#{bno}
+	</update>
+
+	<update id="update">
+		update myBoard
+		set
+		title = #{title},
+		content =
+		#{content}
+		where bno = #{bno}
+	</update>
+
+	<update id="fileupdate">
+
+		update myBoard
+		set
+		title = #{title},
+		content = #{content},
+		filename =
+		#{filename},
+		fileoriname = #{fileOriname},
+		fileurl = #{fileurl}
+		where bno
+		= #{bno}
+
+	</update>
+	<update id="viewcnt">
+		update myBoard
+		set viewCnt = viewCnt+1
+		where bno =
+		#{bno}
+	</update>
+
+	<!-- 삭제 -->
+	<delete id="delete">
+		delete from
+		myBoard
+		where bno = #{bno}
+	</delete>
+
+	<!-- 목록 -->
+	<select id="list" resultType="com.board.VO.BoardVO">
+		select bno, title, writer, regDate
+		from myBoard
+		order by bno desc
+	</select>
+
+	<!-- 페이징 -->
+	<select id="listPage" resultType="com.board.VO.BoardVO"
+		parameterType="com.board.VO.Criteria">
+		select bno, title, content, writer, regDate, viewCnt
+		from (
+		select bno, title, content, writer, regDate, viewCnt,
+		row_number() over(order by bno desc) as rNum
+		from myBoard
+		) mb
+		where rNum
+		between #{rowStart} and #{rowEnd}
+		order by bno desc
+	</select>
+
+
+	<select id="listSearch" resultType="com.board.VO.BoardVO"
+		parameterType="com.board.VO.SearchCriteria">
+		select bno, title, content, writer, regDate, viewCnt
+		from (
+		select bno,
+		title, content, writer, regDate, viewCnt,
+		row_number() over(order by
+		bno desc) as rNum
+		from myBoard
+		<include refid="search"></include>
+		) mb
+		where rNum between #{rowStart} and #{rowEnd}
+		order by bno desc
+	</select>
+
+
+	<select id="listCount" resultType="int">
+	<![CDATA[
+		select count(bno)
+			from myBoard
+				where bno > 0 
+	]]>
+	</select>
+
+
+
+
+
+
+	<select id="countSearch" resultType="int">
+		select count(bno)
+		from myBoard
+		<include refid="search"></include>
+<![CDATA[
+   and bno > 0
+]]>
+	</select>
+
+
+</mapper>
