@@ -1,0 +1,7 @@
+eclipse.preferences.version=1
+encoding//src/com/board/controller/BoardController.java=UTF-8
+encoding//src/com/board/dao/BoardDAO.java=UTF-8
+encoding//src/com/board/dao/BoardDAOImpl.java=UTF-8
+encoding//src/com/board/dao/ReplyDAO.java=UTF-8
+encoding//src/com/board/service/BoardService.java=UTF-8
+encoding//src/com/board/service/BoardServiceImpl.java=UTF-8
